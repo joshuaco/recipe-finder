@@ -141,7 +141,62 @@ function loadApp() {
 
     $modalBody.appendChild($listGroup);
 
+    const $modalFooter = document.querySelector('.modal-footer');
+    cleanHtml($modalFooter);
+
+    // Close and favorite buttons
+    const $btnFavorite = document.createElement('button');
+    $btnFavorite.classList.add('btn', 'btn-danger', 'col');
+    $btnFavorite.textContent = existFavorite(idMeal)
+      ? 'Eliminar de favoritos'
+      : 'Agregar a favoritos';
+
+    // LocalStorage
+    $btnFavorite.onclick = () => {
+      if (existFavorite(idMeal)) {
+        deleteFavorite(idMeal);
+        $btnFavorite.textContent = 'Agregar a favoritos';
+        return;
+      }
+
+      addFavorite({
+        title: strMeal,
+        id: idMeal,
+        image: strMealThumb,
+      });
+      $btnFavorite.textContent = 'Eliminar de favoritos';
+    };
+
+    const $btnClose = document.createElement('button');
+    $btnClose.classList.add('btn', 'btn-secondary', 'col');
+    $btnClose.textContent = 'Cerrar';
+    $btnClose.onclick = () => {
+      $modal.hide();
+    };
+
+    $modalFooter.appendChild($btnFavorite);
+    $modalFooter.appendChild($btnClose);
+
     $modal.show();
+  }
+
+  function addFavorite(meal) {
+    const { idMeal } = meal;
+    const favorites = JSON.parse(localStorage.getItem('favorites')) ?? [];
+
+    localStorage.setItem('favorites', JSON.stringify([...favorites, meal]));
+  }
+
+  function deleteFavorite(id) {
+    const favorites = JSON.parse(localStorage.getItem('favorites')) ?? [];
+    const filteredFavorites = favorites.filter((meal) => meal.id !== id);
+
+    localStorage.setItem('favorites', JSON.stringify(filteredFavorites));
+  }
+
+  function existFavorite(id) {
+    const favorites = JSON.parse(localStorage.getItem('favorites')) ?? [];
+    return favorites.some((meal) => meal.id === id);
   }
 
   function cleanHtml(selector) {
