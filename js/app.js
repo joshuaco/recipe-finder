@@ -1,3 +1,5 @@
+import loadFavorites from './favorites.js';
+
 function loadApp() {
   const $select = document.getElementById('categorias');
 
@@ -62,15 +64,15 @@ function loadApp() {
 
       const $mealImg = document.createElement('img');
       $mealImg.classList.add('card-img-top');
-      $mealImg.alt = `Receta de ${strMeal}`;
-      $mealImg.src = strMealThumb;
+      $mealImg.alt = `Receta de ${strMeal ?? meal.title}`;
+      $mealImg.src = strMealThumb ?? meal.image;
 
       const $mealCardBody = document.createElement('div');
       $mealCardBody.classList.add('card-body');
 
       const $mealTitle = document.createElement('h3');
       $mealTitle.classList.add('card-title', 'mb-3');
-      $mealTitle.textContent = strMeal;
+      $mealTitle.textContent = strMeal ?? meal.title;
 
       const $mealButton = document.createElement('button');
       $mealButton.classList.add('btn', 'btn-danger', 'w-100');
@@ -78,7 +80,7 @@ function loadApp() {
       //$mealButton.dataset.bsTarget = '#modal';
       //$mealButton.dataset.bsToggle = 'modal';
       $mealButton.onclick = () => {
-        selectMeal(idMeal);
+        selectMeal(idMeal ?? meal.id);
       };
 
       /**
@@ -211,12 +213,15 @@ function loadApp() {
 
     $toastBody.textContent = message;
 
-    console.log(toast);
-
     toast.show();
   }
 
-  loadFavorites();
+  // Check if .favoritos exists then app.js is in favorites.html
+  if (document.querySelector('.favoritos')) {
+    loadFavorites(() =>
+      showMeals(JSON.parse(localStorage.getItem('favorites')))
+    );
+  }
 
   function cleanHtml(selector) {
     while (selector.firstChild) {
