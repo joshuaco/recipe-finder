@@ -1,11 +1,14 @@
 function loadApp() {
   const $select = document.getElementById('categorias');
-  $select.addEventListener('change', selectCategory);
+
+  if ($select) {
+    $select.addEventListener('change', selectCategory);
+    fetchCategories();
+  }
 
   const $result = document.getElementById('resultado');
-  const $modal = new bootstrap.Modal('#modal', {});
+  const modal = new bootstrap.Modal('#modal', {});
 
-  fetchCategories();
   async function fetchCategories() {
     const URL = 'https://www.themealdb.com/api/json/v1/1/categories.php';
 
@@ -156,6 +159,7 @@ function loadApp() {
       if (existFavorite(idMeal)) {
         deleteFavorite(idMeal);
         $btnFavorite.textContent = 'Agregar a favoritos';
+        showToast('Eliminado de favoritos');
         return;
       }
 
@@ -165,19 +169,20 @@ function loadApp() {
         image: strMealThumb,
       });
       $btnFavorite.textContent = 'Eliminar de favoritos';
+      showToast('Agregado a favoritos');
     };
 
     const $btnClose = document.createElement('button');
     $btnClose.classList.add('btn', 'btn-secondary', 'col');
     $btnClose.textContent = 'Cerrar';
     $btnClose.onclick = () => {
-      $modal.hide();
+      modal.hide();
     };
 
     $modalFooter.appendChild($btnFavorite);
     $modalFooter.appendChild($btnClose);
 
-    $modal.show();
+    modal.show();
   }
 
   function addFavorite(meal) {
@@ -199,6 +204,20 @@ function loadApp() {
     return favorites.some((meal) => meal.id === id);
   }
 
+  function showToast(message) {
+    const $toastDiv = document.querySelector('#toast');
+    const $toastBody = $toastDiv.querySelector('.toast-body');
+    const toast = new bootstrap.Toast($toastDiv);
+
+    $toastBody.textContent = message;
+
+    console.log(toast);
+
+    toast.show();
+  }
+
+  loadFavorites();
+
   function cleanHtml(selector) {
     while (selector.firstChild) {
       selector.removeChild(selector.firstChild);
@@ -206,4 +225,4 @@ function loadApp() {
   }
 }
 
-loadApp();
+document.addEventListener('DOMContentLoaded', loadApp);
